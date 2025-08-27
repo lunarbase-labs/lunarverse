@@ -16,7 +16,7 @@ class CsvDataAccess(DataAccess):
     ):
         self._data = {
             table_name: pd.read_csv(
-                csv_paths[table_name], sep=separator, encoding=encoding
+                csv_paths[table_name], sep=separator, encoding=encoding, on_bad_lines="warn"
             )
             for table_name in csv_paths
         }
@@ -39,5 +39,8 @@ class CsvDataAccess(DataAccess):
         return self._samples
 
     def _get_sample(self, table_name: str, n: int = 5) -> pd.DataFrame:
+        size = self._data[table_name].shape[0]
+        if size < n:
+            n = size
         sample_df = self._data[table_name].sample(n=n, random_state=0)
         return sample_df
